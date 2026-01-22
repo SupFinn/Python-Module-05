@@ -1,17 +1,18 @@
-#!/usr/bin/python3
-
 from abc import ABC, abstractmethod
 from typing import Any, List, Union, Protocol
 
 
-# ========= STAGE PROTOCOL =========
+# Protocol for processing stages (duck typing)
 class ProcessingStage(Protocol):
+    """Protocol defining a single pipeline stage."""
     def process(self, data: Any) -> Any:
+        """Process data and return the result."""
         pass
 
 
-# ========= PIPELINE STAGES =========
+# Concrete stage implementations (duck typing - no inheritance)
 class InputStage:
+    """Handles input validation."""
     def process(self, data: Any) -> Any:
         if data is None:
             print("Warning: Invalid input data detected...")
@@ -20,6 +21,7 @@ class InputStage:
 
 
 class TransformStage:
+    """Transforms and enriches data."""
     def process(self, data: Any) -> Any:
 
         if data is None:
@@ -33,14 +35,16 @@ class TransformStage:
 
 
 class OutputStage:
+    """Final output stage of the pipeline."""
     def process(self, data: Any) -> Any:
         return data
 
 
-# ========= ABSTRACT PIPELINE =========
+# Abstract base class for pipelines
 class ProcessingPipeline(ABC):
-    def __init__(self) -> None:
-        self.stages: List[ProcessingStage] = []
+    """Abstract base class for data processing pipelines."""
+    def __init__(self, stages: List[ProcessingStage] = None) -> None:
+        self.stages: List[ProcessingStage] = stages if stages else []
 
     def add_stage(self, stage: ProcessingStage) -> None:
         self.stages += [stage]
@@ -60,7 +64,8 @@ class ProcessingPipeline(ABC):
 
     def trigger_errors(self, error_stage: int) -> None:
         """
-        Simulates an error at a specific stage and follows the error recovery test procedure.
+        Simulates an error at a specific stage and follows the error recovery
+        test procedure.
         """
         print("=== Error Recovery Test ===")
         print("Simulating pipeline failure...")
@@ -69,8 +74,13 @@ class ProcessingPipeline(ABC):
         print("Recovery initiated: Switching to backup processor")
         print("Recovery successful: Pipeline restored, processing resumed")
 
-# ========= ADAPTERS =========
+
+# Data adapter implementations (inherit from ProcessingPipeline)
 class JSONAdapter(ProcessingPipeline):
+    """Pipeline adapter for JSON data."""
+    def __init__(self, stages: List[ProcessingStage] = None) -> None:
+        super().__init__(stages)
+
     def process(self, data: Any) -> Any:
         print("Processing JSON data through pipeline...")
         print(f"Input: {data}")
@@ -78,33 +88,45 @@ class JSONAdapter(ProcessingPipeline):
 
         if isinstance(result, dict) and "value" in result:
             print("Transform: Enriched with metadata and validation")
-            print(f"Output: Processed temperature reading: {result['value']}°C (Normal range)")
+            print(
+                f"Output: Processed temperature reading: "
+                f"{result['value']}°C (Normal range)\n"
+                )
 
         return result
 
 
 class CSVAdapter(ProcessingPipeline):
+    """Pipeline adapter for CSV data."""
+    def __init__(self, stages: List[ProcessingStage] = None) -> None:
+        super().__init__(stages)
+
     def process(self, data: Any) -> Any:
         print("Processing CSV data through same pipeline...")
         print(f"Input: \"{data}\"")
         self.run(data)
         print("Transform: Parsed and structured data")
-        print("Output: User activity logged: 1 actions processed")
+        print("Output: User activity logged: 1 actions processed\n")
         return data
 
 
 class StreamAdapter(ProcessingPipeline):
+    """Pipeline adapter for streaming data."""
+    def __init__(self, stages: List[ProcessingStage] = None) -> None:
+        super().__init__(stages)
+
     def process(self, data: Any) -> Any:
         print("Processing Stream data through same pipeline...")
         print("Input: Real-time sensor stream")
         self.run(data)
         print("Transform: Aggregated and filtered")
-        print("Output: Stream summary: 5 readings, avg: 22.1°C")
+        print("Output: Stream summary: 5 readings, avg: 22.1°C\n")
         return data
 
 
-# ========= NEXUS MANAGER =========
+# Pipeline orchestration manager
 class NexusManager:
+    """Manages and connects multiple pipelines."""
     def __init__(self) -> None:
         self.pipelines = {}
 
@@ -119,15 +141,14 @@ class NexusManager:
         return data
 
 
-# ========= MAIN =========
 def main() -> None:
-    print("=== CODE NEXUS - ENTERPRISE PIPELINE SYSTEM ===")
+    print("=== CODE NEXUS - ENTERPRISE PIPELINE SYSTEM ===\n")
     print("Initializing Nexus Manager...")
-    print("Pipeline capacity: 1000 streams/second")
+    print("Pipeline capacity: 1000 streams/second\n")
     print("Creating Data Processing Pipeline...")
     print("Stage 1: Input validation and parsing")
     print("Stage 2: Data transformation and enrichment")
-    print("Stage 3: Output formatting and delivery")
+    print("Stage 3: Output formatting and delivery\n")
 
     manager = NexusManager()
 
@@ -144,7 +165,7 @@ def main() -> None:
     manager.register("CSV", csv_pipeline)
     manager.register("STREAM", stream_pipeline)
 
-    print("=== Multi-Format Data Processing ===")
+    print("=== Multi-Format Data Processing ===\n")
 
     json_pipeline.process({"sensor": "temp", "value": 23.5})
     csv_pipeline.process("user,action,timestamp")
@@ -152,13 +173,13 @@ def main() -> None:
 
     print("=== Pipeline Chaining Demo ===")
     print("Pipeline A -> Pipeline B -> Pipeline C")
-    print("Data flow: Raw -> Processed -> Analyzed -> Stored")
+    print("Data flow: Raw -> Processed -> Analyzed -> Stored\n")
     print("Chain result: 100 records processed through 3-stage pipeline")
-    print("Performance: 95% efficiency, 0.2s total processing time")
+    print("Performance: 95% efficiency, 0.2s total processing time\n")
 
     json_pipeline.trigger_errors(2)
 
-    print("Nexus Integration complete. All systems operational.")
+    print("\nNexus Integration complete. All systems operational.")
 
 
 if __name__ == "__main__":
